@@ -17,7 +17,7 @@ output = pd.DataFrame()
 for ticker in tickers:
     data, meta_data = ts.get_daily(symbol=tickers[0], outputsize='full')
     data['ticker'] = ticker
-    output = output.append(data.iloc[-500:])
+    output = output.append(data.iloc[-1500:])
     print(ticker)
     time.sleep(2)
     
