@@ -15,10 +15,10 @@ ts = TimeSeries(key=api, output_format='pandas')
 output = pd.DataFrame()
 
 for ticker in tickers:
-    data, meta_data = ts.get_daily(symbol=tickers[0], outputsize='full')
+    data, meta_data = ts.get_daily(symbol=ticker, outputsize='full')
     data['ticker'] = ticker
     output = output.append(data.iloc[-1500:])
     print(ticker)
-    time.sleep(2)
+    time.sleep(5)
     
-output.to_csv("DJUSTC breakdown.csv")
+output.to_csv("DJUSTC Prices.csv")

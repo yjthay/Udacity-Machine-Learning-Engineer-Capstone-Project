@@ -11,7 +11,7 @@ ratios.index = ratios[ratios.columns[1]]
 ratios = ratios.drop(ratios.columns[[0,1]],axis=1)
 
 
-prices = pd.read_csv("DJUSTC breakdown.csv")
+prices = pd.read_csv("DJUSTC Prices.csv")
 #prices.date = prices.date.apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d"))
 prices.date = pd.to_datetime(prices.date)
 
