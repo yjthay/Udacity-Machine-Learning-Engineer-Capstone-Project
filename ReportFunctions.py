@@ -64,3 +64,9 @@ def data_for_modelling(X_train,y_train,ticker=slice(None),days = 30):
         X_train_unstack.append(X_train.loc[start:end,(slice(None),ticker)].unstack().transpose().values)
         y_train_unstack.append(y_train.loc[end,ticker])
     return np.array(X_train_unstack), np.array(y_train_unstack)
+
+def check_missing(pivot):
+    total = pivot.isnull().sum().sort_values(ascending = False)
+    percent = (pivot.isnull().sum()/pivot.isnull().count()*100).sort_values(ascending = False)
+    missing_data  = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
+    return missing_data[missing_data['Total']>0]
