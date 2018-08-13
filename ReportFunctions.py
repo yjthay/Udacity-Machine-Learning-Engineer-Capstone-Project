@@ -57,13 +57,25 @@ def plot_before_after(adjusted_pivot, pivot, indices_to_adjust, tickers):
                                                                     title = ticker + "_" + index.upper() + "_Before").axis('off')
             plot_number+=1
 
-def data_for_modelling(X_train,y_train,ticker=slice(None),days = 30):
+def data_LSTM(X_train,y_train,ticker=slice(None),days = 30):
+    X_train_LSTM,y_train_LSTM = list(),list()
+    #X_test_unstack,y_test_unstack = pd.DataFrame(),pd.DataFrame()
+    for start,end in zip(X_train.index[:-days],X_train.index[days:]):
+        X_train_LSTM.append(X_train.loc[start:end,(slice(None),ticker)].values)
+        y_train_LSTM.append(y_train.loc[end,ticker])
+    X_train_LSTM = np.array(X_train_LSTM)
+    y_train_LSTM = np.array(y_train_LSTM)
+    return X_train_LSTM, y_train_LSTM
+    
+def data_Dense(X_train,y_train,ticker=slice(None),days = 30):
     X_train_unstack,y_train_unstack = list(),list()
     #X_test_unstack,y_test_unstack = pd.DataFrame(),pd.DataFrame()
     for start,end in zip(X_train.index[:-days],X_train.index[days:]):
         X_train_unstack.append(X_train.loc[start:end,(slice(None),ticker)].unstack().transpose().values)
         y_train_unstack.append(y_train.loc[end,ticker])
     return np.array(X_train_unstack), np.array(y_train_unstack)
+
+
 
 def check_missing(pivot):
     total = pivot.isnull().sum().sort_values(ascending = False)
