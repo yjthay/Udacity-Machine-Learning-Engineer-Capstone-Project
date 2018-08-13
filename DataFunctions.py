@@ -7,14 +7,14 @@ Created on Fri Jul 20 18:42:25 2018
 
 import os
 import pandas as pd
-import alpha_vantage as av
 from alpha_vantage.timeseries import TimeSeries
 import datetime,time
 import re
 from datetime import datetime
+import requests
 
 def alpha_vantage_download(api):
-    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Submission")
+    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Udacity-Machine-Learning-Engineer-Capstone-Project/Data Raw")
     
     DJUSTC = pd.read_csv("TickerNamesDJUSTC.csv")
     tickers = list(DJUSTC.Symbol)
@@ -28,15 +28,15 @@ def alpha_vantage_download(api):
         print(ticker)
         time.sleep(30)
         
-    output.to_csv("DJUSTC Prices new.csv")
+    output.to_csv("DJUSTC Prices.csv")
 
-def morningstar_download(output_file="TickerNamesDJUSTC.csv"):
-    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Submission")
-    DJUSTC = pd.read_csv(output_file)
+def morningstar_download(input_file="../TickerNamesDJUSTC.csv"):
+    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Udacity-Machine-Learning-Engineer-Capstone-Project/Data Raw/Morningstar Financials")
+    DJUSTC = pd.read_csv(input_file)
     tickers = list(DJUSTC.Symbol)
     
-    url_part1 = "http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t="
-    url_part2 = "&reportType=is&period=12&dataType=A&order=asc&columnYear=5&number=3"
+    #url_part1 = "http://financials.morningstar.com/ajax/ReportProcess4CSV.html?t="
+    #url_part2 = "&reportType=is&period=12&dataType=A&order=asc&columnYear=5&number=3"
     
     url_all = "http://financials.morningstar.com/ajax/exportKR2CSV.html?t="
     
@@ -53,10 +53,10 @@ def morningstar_download(output_file="TickerNamesDJUSTC.csv"):
         time.sleep(10)
 
 def morningstar_cleaning(output_file = "DJUSTC Key Ratios.csv"):
-    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Submission/Morningstar Financials")
+    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Udacity-Machine-Learning-Engineer-Capstone-Project/Data Raw/Morningstar Financials")
     output = pd.DataFrame()
     regex = re.compile(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)")
-    for dirpath, dirnames, filenames in os.walk("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Submission/Morningstar Financials"):
+    for dirpath, dirnames, filenames in os.walk("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Udacity-Machine-Learning-Engineer-Capstone-Project/Data Raw/Morningstar Financials"):
         for f in filenames:
             fhand = open(f)
             mylist = []
@@ -71,7 +71,6 @@ def morningstar_cleaning(output_file = "DJUSTC Key Ratios.csv"):
                 #i+=1
                 #if i==4:
                     #break
-            print(data.iloc[2].apply(lambda x: x[:4]))
             data=pd.DataFrame(mylist)
             mydata =  data[3:18]
             mydata.columns = data.iloc[2].apply(lambda x: x[:4])
@@ -81,7 +80,7 @@ def morningstar_cleaning(output_file = "DJUSTC Key Ratios.csv"):
     output.to_csv("../"+output_file)
     
 def data_merging_hdf():
-    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Submission")
+    os.chdir("C:/Users/YJ/Documents/1) Learning/Udacity - Machine Learning/capstone/Udacity-Machine-Learning-Engineer-Capstone-Project/Data Raw")
 
     ratios = pd.read_csv("DJUSTC Key Ratios.csv")
     ratios.index = ratios[ratios.columns[1]]
