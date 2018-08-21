@@ -4,16 +4,11 @@ Created on Fri Jul 20 19:25:40 2018
 
 @author: YJ
 """
-import os
 import pandas as pd
-import alpha_vantage as av
-from alpha_vantage.timeseries import TimeSeries
 import numpy as np
-import datetime,time
-import re
-from datetime import datetime
-import matplotlib
 from matplotlib import pyplot as plt
+import keras
+from IPython.display import clear_output
 
 def returns_x_days(adjusted_close, days = 30):
     dates = adjusted_close.index.sort_values(ascending=True)
@@ -75,10 +70,48 @@ def data_Dense(X_train,y_train,ticker=slice(None),days = 30):
         y_train_unstack.append(y_train.loc[end,ticker])
     return np.array(X_train_unstack), np.array(y_train_unstack)
 
-
-
 def check_missing(pivot):
     total = pivot.isnull().sum().sort_values(ascending = False)
     percent = (pivot.isnull().sum()/pivot.isnull().count()*100).sort_values(ascending = False)
     missing_data  = pd.concat([total, percent], axis=1, keys=['Total', 'Percent'])
     return missing_data[missing_data['Total']>0]
+
+#https://github.com/deepsense-ai/intel-ai-webinar-neural-networks/blob/master/live_loss_plot.py
+class PlotLosses(keras.callbacks.Callback):
+    def __init__(self, figsize=None):
+        super(PlotLosses, self).__init__()
+        self.figsize = figsize
+
+    def on_train_begin(self, logs={}):
+
+        self.base_metrics = [metric for metric in self.params['metrics'] if not metric.startswith('val_')]
+        self.logs = []
+
+    def on_epoch_end(self, epoch, logs={}):
+        self.logs.append(logs)
+
+        clear_output(wait=True)
+        plt.figure(figsize=self.figsize)
+        
+        for metric_id, metric in enumerate(self.base_metrics):
+            plt.subplot(1, len(self.base_metrics), metric_id + 1)
+            
+            plt.plot(range(1, len(self.logs) + 1),
+                     [log[metric] for log in self.logs],
+                     label="training")
+            if self.params['do_validation']:
+                plt.plot(range(1, len(self.logs) + 1),
+                         [log['val_' + metric] for log in self.logs],
+                         label="validation")
+            plt.title(self._translate_metric(metric))
+            plt.xlabel('epoch')
+            plt.legend(loc='center right')
+        
+        plt.tight_layout()
+        plt.show();
+    def _translate_metric(self, x):
+        translations = {'acc': "Accuracy", 'loss': "Log-loss (cost function)"}
+        if x in translations:
+            return translations[x]
+        else:
+            return x
